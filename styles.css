@@ -1,0 +1,228 @@
+/* ===== 基本色・装飾 ===== */
+:root{
+  --text:#333; --muted:#666; --panel:#ffffffcc; --frame:#e6dfcf;
+  --love:#d86a8a; --money:#b99445; --work:#4b9bb0;
+}
+html, body { height: 100%; } * { box-sizing: border-box; }
+/* === 背景テーマ（昼＝フェアリー／夜＝ミステリアス） === */
+/* ページ全体（昼）を上品に：アイボリー→シャンパンの柔らかグラデ */
+body.bg-fairy {
+  background: linear-gradient(145deg,#fceeff,#f9f6ff,#fffafc);
+}
+
+body.bg-mystic {
+  background: linear-gradient(145deg,#1a1a2e,#2c2c54,#3e2f4f);
+  background-attachment: fixed;
+}
+
+/* タブレット用調整 */
+@media (max-width: 1024px) {
+  body {
+    background-position: center top;
+    background-attachment: scroll; /* スクロール固定解除 */
+  }
+}
+
+/* スマホ用調整 */
+@media (max-width: 768px) {
+  body {
+    background-position: center;
+    background-size: cover;
+  }
+}
+
+.tarot-container{ max-width: 600px; margin: 0 auto; background: var(--panel);
+  border-radius: 12px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,.1);}
+@supports (backdrop-filter: blur(6px)) { .tarot-container{ backdrop-filter: blur(6px);} }
+h1{ font-size: 2rem; margin: .2em 0 .3em; font-weight: 700; letter-spacing: .02em; }
+h1 .sub{ display:block; font-size:.9rem; color:var(--muted); margin-top:.2em; }
+p{ color: var(--muted); margin: 0 0 12px; }
+
+/* ===== タブ（表示切替） ===== */
+.fortune-switch{
+  display:grid; grid-template-columns: repeat(3,minmax(0,1fr));
+  gap:12px; margin:12px 0 18px; position: sticky; top: 8px; z-index: 5;
+}
+.fortune-btn{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:14px 8px; border-radius:14px; background: rgba(255,255,255,.88);
+  border:1.5px solid var(--frame); box-shadow:0 8px 18px rgba(0,0,0,.08);
+  cursor:pointer; transition:.2s ease;
+}
+.fortune-btn .label{ font-weight:700; letter-spacing:.02em; font-size:1.05rem; line-height:1.1; }
+.fortune-btn .sub{ font-size:.75rem; opacity:.7; margin-top:2px; }
+.fortune-btn:is(:hover,:focus-visible){ transform: translateY(-2px); box-shadow:0 12px 24px rgba(0,0,0,.12); outline:none; }
+.fortune-btn.is-active{
+  background:linear-gradient(180deg,#fff,#f9f6ee); border-color:transparent; box-shadow:0 14px 28px rgba(0,0,0,.14); position:relative;
+}
+.fortune-btn.is-active::after{
+  content:""; position:absolute; inset:0; border-radius:14px; pointer-events:none; padding:1.5px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.6), rgba(255,255,255,0)) border-box,
+    linear-gradient(135deg, #f7e9c2 0%, #d7b97a 35%, #b1842b 65%, #fff3c7 100%) border-box;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite: exclude; border:1.5px solid transparent;
+}
+.fortune-btn[data-type="love"].is-active .label{ color:var(--love); }
+.fortune-btn[data-type="money"].is-active .label{ color:var(--money); }
+.fortune-btn[data-type="work"].is-active .label{ color:var(--work); }
+
+/* ===== カード群 ===== */
+.card-row{ display:flex; justify-content:space-around; gap:16px; margin:20px 0 8px; flex-wrap:wrap; }
+.card-back{
+  width:130px; aspect-ratio:3/5; height:auto; cursor:pointer;
+  transition: transform .25s ease, box-shadow .25s ease, opacity .25s ease, filter .25s ease;
+  border-radius:12px; box-shadow:0 8px 18px rgba(0,0,0,.08);
+}
+.card-back:hover,.card-back:focus-visible{
+  transform: translateY(-4px) scale(1.06); box-shadow:0 14px 28px rgba(0,0,0,.14);
+  outline:2px solid rgba(0,0,0,.15); outline-offset:2px;
+}
+.card-back.selected{ transform: translateY(-2px) scale(1.04); box-shadow:0 16px 30px rgba(0,0,0,.18); border:2px solid rgba(214,185,122,.8); }
+.card-back.dimmed{ opacity:.35; filter: blur(1px) saturate(.85); transform: scale(.96); pointer-events:none; }
+
+/* ===== 結果表示 ===== */
+.result{ margin-top:24px; min-height:380px; display:none; }
+.result.show{ display:block; }
+@keyframes fadeScaleIn{0%{opacity:0;transform:scale(.92) translateY(8px);}100%{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(10px);}100%{opacity:1;transform:translateY(0);}}
+
+/* カード画像・タイトル */
+.result img{
+  width:min(340px,90vw); height:auto; display:block; margin:0 auto 12px;
+  border-radius:14px; box-shadow:0 10px 26px rgba(0,0,0,.12); opacity:0; transform:scale(.92) translateY(8px);
+}
+.result h2{ opacity:0; transform:translateY(10px); font-size:1.5rem; margin:0 0 14px; }
+
+/* パネル共通（総合運・各テーマ） */
+.panel{
+  margin:0 auto 14px; max-width:520px; background:linear-gradient(#fff,#fff8ef);
+  border:1.5px solid #ead7a8; border-radius:12px; padding:12px 14px; text-align:left;
+  box-shadow:0 8px 18px rgba(0,0,0,.06); opacity:0; transform:translateY(8px);
+}
+.panel-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
+.panel-title{ font-weight:700; letter-spacing:.03em; font-size:1.05rem; color:#6b5a2a; }
+.panel-stars{ font-size:1rem; letter-spacing:.1em; white-space:nowrap; }
+.panel-text{ margin:0; line-height:1.6; color:#444; }
+
+/* テーマ別（囲みも総合風） */
+.fortune-panel[data-type="love"]{ border-color:#f1d6de; background:linear-gradient(#fff,#ffeaf0); }
+.fortune-panel[data-type="love"] .panel-title{ color:var(--love); }
+.fortune-panel[data-type="money"]{ border-color:#ead7a8; background:linear-gradient(#fff,#fff6dc); }
+.fortune-panel[data-type="money"] .panel-title{ color:var(--money); }
+.fortune-panel[data-type="work"]{ border-color:#cfe7ee; background:linear-gradient(#fff,#eefbff); }
+.fortune-panel[data-type="work"] .panel-title{ color:var(--work); }
+
+/* タブパネルの表示制御（hidden使用） */
+[role="tabpanel"][hidden]{ display:none !important; }
+
+/* アニメ付与 */
+.result .reveal-card{ animation: fadeScaleIn .5s ease forwards; }
+.result .reveal-title{ animation: fadeUp .45s ease .1s forwards; }
+.result .reveal-overall{ animation: fadeUp .45s ease .16s forwards; }
+.result .reveal-panel{ animation: fadeUp .45s ease .22s forwards; }
+
+/* リトライ */
+.retry-btn{
+  margin-top:16px; padding:.6em 1.1em; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer; transition:.2s ease;
+}
+.retry-btn:is(:hover,:focus-visible){ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.08); }
+
+/* モバイル */
+@media (max-width:560px){ .fortune-btn{ padding:12px 6px; } .fortune-btn .label{ font-size:1rem; } .fortune-btn .sub{ display:none; } }
+@media (max-width:480px){ .card-back{ width:110px; } .card-row{ gap:12px; } }
+
+/* 低モーション */
+@media (prefers-reduced-motion: reduce){
+  .card-back,.result img,.result h2,.panel,.retry-btn{ transition:none!important; animation:none!important; transform:none!important; }
+}
+
+/* === リトライボタン === */
+.retry-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+}
+.retry-btn {
+  position: relative;
+  padding: 0.9em 1.8em;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all .35s ease;
+}
+
+/* ===== 昼（フェアリー／紫ラグジュアリー版ボタン） ===== */
+.retry-btn.fairy {
+  position: relative;
+  border: 1.6px solid #b28ce3; /* ラベンダーゴールド調 */
+  background: linear-gradient(160deg,#ffffff,#f6f0ff 55%, #efe3ff);
+  color: #5a3c88;
+  font-weight: 600;
+  letter-spacing: .045em;
+  box-shadow:
+    0 10px 22px rgba(178,140,227,.25),
+    inset 0 1px 0 rgba(255,255,255,.6),
+    inset 0 -6px 12px rgba(178,140,227,.15);
+  transition: all .35s ease;
+}
+
+/* 内側の煌めき（粒子） */
+.retry-btn.fairy::before {
+  content:"";
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(circle at 25% 35%, rgba(200,170,255,.25), transparent 60%),
+    radial-gradient(circle at 70% 65%, rgba(255,255,255,.18), transparent 70%);
+}
+
+/* ガラスの艶（ホバー時に流れる） */
+.retry-btn.fairy::after {
+  content:"";
+  position:absolute; top:-40%; left:-30%;
+  width:60%; height:180%;
+  transform: rotate(20deg) translateX(-120%);
+  background: linear-gradient(to right,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.45) 45%,
+    rgba(255,255,255,0) 100%);
+  transition: transform .7s ease;
+}
+
+.retry-btn.fairy:is(:hover,:focus-visible) {
+  transform: translateY(-2px) scale(1.05);
+  color: #7c52b0;
+  background: linear-gradient(160deg,#fff,#f8f2ff 55%, #f0e0ff);
+  box-shadow:
+    0 16px 30px rgba(178,140,227,.35),
+    inset 0 1px 0 rgba(255,255,255,.75),
+    inset 0 -8px 16px rgba(178,140,227,.18);
+}
+
+.retry-btn.fairy:is(:hover,:focus-visible)::after {
+  transform: rotate(20deg) translateX(140%); /* 艶が横切る */
+}
+
+
+/* ミステリアス（夜用） */
+.retry-btn.mystic {
+  border: 1.5px solid rgba(215,185,122,.8);
+  background: linear-gradient(145deg, #1a1a2e, #2c2c54, #3e2f4f);
+  color: #f8f5e7;
+  box-shadow: 0 8px 22px rgba(0,0,0,.3), inset 0 0 10px rgba(255,255,255,.08);
+}
+.retry-btn.mystic::before {
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,.2), transparent 70%),
+              radial-gradient(circle at 70% 60%, rgba(255,215,150,.15), transparent 80%);
+}
+.retry-btn.mystic:is(:hover,:focus-visible) {
+  transform: translateY(-2px) scale(1.05);
+  background: linear-gradient(145deg, #22223b, #2c2c54, #453457);
+  color: #ffe9b3;
+  box-shadow: 0 12px 28px rgba(0,0,0,.4), 0 0 18px rgba(215,185,122,.5);
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>妖精タロット占い</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="tarot-container" role="main" aria-live="polite">
+    <h1>妖精タロット占い <span class="sub">（フェアリー大アルカナ 21枚）</span></h1>
+    <p>3枚のカードの中からお好きなカードをタップ（クリック）してください。</p>
+
+    <!-- 本物のタブ化（結果表示後は内容の表示/非表示を切替） -->
+    <section class="fortune-switch" role="tablist" aria-label="占いたいテーマの切替">
+      <button id="tab-love"  class="fortune-btn is-active" role="tab" aria-selected="true"  aria-controls="panel-love"  tabindex="0" data-type="love">
+        <span class="label">恋愛運</span><span class="sub">Love</span>
+      </button>
+      <button id="tab-money" class="fortune-btn" role="tab" aria-selected="false" aria-controls="panel-money" tabindex="-1" data-type="money">
+        <span class="label">金運</span><span class="sub">Money</span>
+      </button>
+      <button id="tab-work"  class="fortune-btn" role="tab" aria-selected="false" aria-controls="panel-work"  tabindex="-1" data-type="work">
+        <span class="label">仕事運</span><span class="sub">Career</span>
+      </button>
+    </section>
+
+    <!-- 3枚の背面カード -->
+    <div class="card-row">
+      <img src="ftimg/backfy.png" alt="カード背面1" class="card-back" tabindex="0" />
+      <img src="ftimg/backfy.png" alt="カード背面2" class="card-back" tabindex="0" />
+      <img src="ftimg/backfy.png" alt="カード背面3" class="card-back" tabindex="0" />
+    </div>
+
+    <!-- 結果エリア（スクリプトでタブパネルを挿入） -->
+    <div id="result" class="result" aria-live="polite"></div>
+  </main>
+
+  <script src="script.js" defer></script>
+  <noscript>JavaScriptを有効にすると占いを体験できます。</noscript>
+</body>
+</html>
